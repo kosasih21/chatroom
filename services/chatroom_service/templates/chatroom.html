@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="text-align: center">Chatroom name: {{ room.chatroom_name }}</h1>
+<p class="chatroom-description">Chatroom description: {{ room.description }}</p>
+
+
+<ul id="messages" class="messages-list">
+  {% for msg in messages %}
+      <li class="message-item" style="background-color: {{ msg.color }};">
+          <small class="message-timestamp">({{ msg.timestamp }})</small>
+          <strong class="message-username">{{ msg.username }}: <!-- <b>(ID: {{ msg.user }})</b> --></strong> 
+          <span class="message-text">{{ msg.message }}</span>
+      </li>
+  {% endfor %} <!-- Close the for loop -->
+</ul>
+
+  <div class="form-group">
+    <form id="message-form"  method="post" class="message-form" >
+    <label for="message">Message:</label>
+    <div>You are logged in as <code>{{username}}</code>.</div>
+
+    <input type="text" id="message" name="message" required class="form-input"><br><br>
+    <button type="submit" class="button">Send</button>
+
+    <label for="files" class="button" style="display:inline-block; color:#fff">Upload picture</label>
+    <input onchange="uploadFile(this)" type="file" id="files" name="myfile" accept="image/png, image/jpeg" multiple style="display: none">
+
+    </form>
+
+  </div>
+
+<a href="{{ url_for('chatrooms', profile_id=request.args.get('profile_id'), access_token=request.args.get('access_token')) }}" class="button">Back to Chatrooms</a>
+
+
+<!-- Include Socket.IO -->
+<script>
+
+  // Join the chatroom's Redis channel
+  const roomName = "{{ room.chatroom_name }}";
+  const username = "{{ username }}";
+  const room_id = {{ room_id }};
+
+  const access_token = "{{ request.args.get('access_token') }}";  // access token from the request
+
+  function uploadFile(input) {
+    // Implement file upload functionality
+    for (let file of input.files) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Upload file to file service (replace <EC2_PUBLIC_IP> with your actual IP)
+        fetch("http://54.242.224.204:5000/upload?access_token=" + encodeURIComponent(access_token), { // might be wrong lol
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.filename) { 
+                console.log("File uploaded, filename:", data.filename);
+
+                // Send a message with image reference to the chat
+                fetch("/send_message?" + new URLSearchParams({ 
+                    profile_id: {{ profile_id }},
+                    access_token: "{{ request.args.get('access_token') }}"
+                }), {
+                    method: 'POST',  
+                    headers: {  
+                      'Content-Type': 'application/json'  
+                    },  
+                    body: JSON.stringify({ 
+                      room_id: room_id,  
+                      username: username,  
+                      message: "image",   // placehold text message  
+                      image: data.filename  // Include the uploaded filename
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        console.error("Failed to send image message");
+                    }
+                })
+                .catch(error => console.error("Error sending image message:", error));
+            } else {
+                console.error("File upload failed", data);
+            }
+        })
+        .catch(error => console.error("Upload error:", error));  
+    }
+  }
+
+  function refresh() {
+      fetch(`/chatroom_refresh/${room_id}?`+ new URLSearchParams({ 
+          profile_id: {{ profile_id }},
+          access_token: "{{ request.args.get('access_token') }}"  
+      })).then(response => response.json()).then(messages => {
+          const message_list = document.getElementById('messages');
+          let text = "";
+          for (let msg of messages) {
+              // added check for message contains an image field
+              if (msg.image) {  
+                text += `<li class="message-item" style="background-color: ${ msg.color };">
+                            <small class="message-timestamp">(${ msg.timestamp })</small>
+                            <strong class="message-username">${ msg.username }:</strong> 
+                            <img src="http://<EC2_PUBLIC_IP>:5000/files/${ msg.image }" alt="Image" style="max-width:200px; max-height:200px;">
+                          </li>`;  
+              } else {  
+                text += 
+                `<li class="message-item" style="background-color: ${ msg.color };">
+                    <small class="message-timestamp">(${ msg.timestamp })</small>
+                    <strong class="message-username">${ msg.username }:</strong> 
+                    <span class="message-text">${ msg.message }</span>
+                </li>`;
+              }  
+          }
+          message_list.innerHTML = text;
+      });
+  }
+
+  const REFRESH_TIMEOUT = 1000; // one second polling interval
+
+  // auto refresh
+  let timer = undefined;
+  const startTimer = () => {
+      if (timer !== undefined)
+          clearTimeout(timer);
+      refresh();
+      timer = setTimeout(startTimer, REFRESH_TIMEOUT);
+  };
+  timer = setTimeout(startTimer, REFRESH_TIMEOUT);
+
+  // Handle form submission to send a message
+  const form = document.getElementById("message-form");
+  form.addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent page reload
+
+      const messageInput = document.getElementById("message");
+      const messageText = messageInput.value;
+
+      fetch("/send_message?" + new URLSearchParams({ 
+          profile_id: {{ profile_id }},
+          access_token: "{{ request.args.get('access_token') }}"  
+      }), {
+        method: 'POST',
+        credentials: "same-origin",
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({
+          room_id: room_id,
+          username: username,
+          message: messageText,  
+        })
+      }).catch(error => alert(error.message))
+       .then(result => {
+          if (result.ok) {
+            startTimer();
+          } else {
+            alert(result.statusText);
+          }
+       });
+
+      // Clear the input field
+      messageInput.value = "";
+  });
+
+</script>
+
+{% endblock %}

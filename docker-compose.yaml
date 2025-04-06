@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: db
+      MYSQL_USER: username
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  auth_service:
+    build:
+      context: ./services/auth_service
+    depends_on:
+      - mysql
+    ports:
+      - "5001:80"
+    environment:
+      DB_HOST: mysql
+      DB_NAME: db
+      DB_USER: username
+      DB_PASSWORD: password
+
+  profile_service:
+    build:
+      context: ./services/profile_service
+    depends_on:
+      - mysql
+    ports:
+      - "5004:80"
+    links:
+      - mysql:mysql
+    environment:
+      DB_HOST: mysql
+      DB_NAME: db
+      DB_USER: username
+      DB_PASSWORD: password
+
+  login_service:
+    build:
+      context: ./services/login_service
+    ports:
+      - "5002:80"
+    links:
+      - profile_service:profile_service
+      - auth_service:auth_service
+
+  chatroom_service:
+    build:
+      context: ./services/chatroom_service
+    depends_on:
+      - mysql
+    ports:
+      - "5003:80"
+    links:
+      - mysql:mysql
+      - auth_service:auth_service
+      - profile_service:profile_service
+    environment:
+      DB_HOST: mysql
+      DB_NAME: db
+      DB_USER: username
+      DB_PASSWORD: password
+
+  file_service:
+    build:
+      context: ./services/file_service
+    ports:
+      - "5000:80"
+    volumes:
+      - file_data:/uploads
+    environment:
+      AUTH_SERVICE_HOST: auth_service
+    
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpadmin
+    ports:
+      - "5005:80"
+    links:
+      - mysql:mysql
+    environment:
+      PMA_HOST: mysql
+
+volumes:
+  mysql_data:
+  file_data:
+
+# Add more services as needed 
+

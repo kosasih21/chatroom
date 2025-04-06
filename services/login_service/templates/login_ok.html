@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App</title>
+  <script>
+    function doredir() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const profile_id = "{{profile_id}}";
+        const access_token = "{{access_token}}";
+        if (!profile_id || !access_token)
+            alert("Invalid login");
+        else {
+            const newurl = window.location.protocol + "//" + window.location.hostname + `:{{chat_service_port}}/chatrooms?profile_id=${profile_id}&access_token=${access_token}`;
+            window.location = newurl;
+        }
+    }
+  </script>
+</head>
+<body onload="doredir()">
+</body>
+</html>

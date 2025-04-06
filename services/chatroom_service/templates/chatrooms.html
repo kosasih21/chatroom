@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Chatrooms</h1>
+<!-- <a href="{{ url_for('create_chatroom') }}" class="create-chatroom-button">+ Create New Chatroom</a> -->
+<div>You are logged in as <code>{{current_username}}</code>.</div>
+<a href="{{ url_for('create_chatroom', profile_id=request.args.get('profile_id'), access_token=request.args.get('access_token')) }}" class="create-chatroom-button">+ Create New Chatroom</a>
+
+<!-- Success Message -->
+<div id="success-message" class="success-popup">
+  <p>You have successfully joined the chatroom!</p>
+  <a href="#" class="close-popup">Close</a>
+</div>
+
+<!-- Left Chatroom Message -->
+<div id="left-message" class="left-popup">
+  <p>You have successfully left the chatroom!</p>
+  <a href="#" class="close-left-popup">Close</a>
+</div>
+
+<!-- <p>Current User: {{ current_user }}</p> -->
+<ul class="chatroom-list">
+  {% for room in rooms %}
+  <li class="chatroom-item">
+    <div class="chatroom-info">
+      <a href="{{ url_for('chatroom', room_id=room.chatroom_id, profile_id=request.args.get('profile_id'), access_token=request.args.get('access_token')) }}" class="chatroom-name">{{ room.chatroom_name }}</a>
+    </div>
+    {% set member_ids = chatroomMembers | selectattr('chatroom_id', 'equalto', room.chatroom_id) | map(attribute='profile_id') | list %}
+    <!-- <p>Member IDs for this chatroom: {{ member_ids }}</p> -->
+    {% if current_user | int in member_ids %}
+          <!-- User is already a member -->
+          <form action="{{ url_for('leave_chatroom', room_id=room.chatroom_id, profile_id=request.args.get('profile_id'),access_token=request.args.get('access_token')) }}#left-message" method="post" style="display:inline;">
+              <button type="submit" class="leave-button">Leave</button>
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          </form>
+      {% else %}
+          <!-- User is not a member -->
+        <form action="{{ url_for('join_chatroom', room_id=room.chatroom_id, profile_id=request.args.get('profile_id'),access_token=request.args.get('access_token')) }}#success-message" method="post" style="display:inline;">
+            <button type="submit" class="join-button">Join</button>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+      {% endif %}
+  </li>
+{% endfor %}
+</ul>
+
+
+{% endblock %}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script>
+      function go(destination) {
+        const port = 5002;
+        const newurl = window.location.protocol + "//" + window.location.hostname + `:${port}/${destination}`;
+        window.location = newurl;
+      }
+  </script>
+</head>
+<body>
+  <nav class="nav-bar">
+          <a onclick="go('login')" class="nav-bar-item">Login</a>
+          <a onclick="go('logout'+window.location.search)" class="nav-bar-item">Logout</a>
+  </nav>
+  {% if app_message %}
+    <div class="app-message">
+        {{ app_message }}
+    </div>
+  {% endif %}
+  <div class="content">
+      {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

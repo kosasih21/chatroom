@@ -1,0 +1,292 @@
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+
+.app-message {
+  border: 2px solid red;
+  background-color: lightgray;
+  text-align: center;
+  padding: 20px;
+  margin: 20px;
+}
+
+.nav-bar-item {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.5rem 3rem;
+    margin: 0 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+  }
+  
+  .nav-bar-item:hover {
+    background-color: #555;
+    border-radius: 4px;
+  }
+  
+  /* Logout Link */
+  .nav-bar a[href="/logout"] {
+    color: #ff6b6b;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+  }
+
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.basic-form {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+.form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 0.1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+
+.form-input:focus {
+    border-color: #555;
+    outline: none;
+  }
+
+.button {
+    display: inline-block;
+    background-color: #333;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+.button:hover {
+    background-color: #555;
+  }
+
+  .register-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #333;
+  }
+  
+  .register-link a {
+    color: #ff6b6b;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .register-link a:hover {
+    color: #ff4c4c;
+  }
+
+  .create-chatroom-button {
+    display: inline-block;
+    background-color: #333;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .create-chatroom-button:hover {
+    background-color: #555;
+  }
+  
+  /* Chatroom List */
+  .chatroom-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .chatroom-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chatroom-info {
+    flex-grow: 1;
+  }
+
+.join-button,
+.leave-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.join-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.join-button:hover {
+  background-color: #218838;
+}
+
+.leave-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.leave-button:hover {
+  background-color: #c82333;
+}
+
+.chatroom-name {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+
+.message-form {
+    margin-bottom: 1.5rem;
+  }
+
+  .chatroom-description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  .messages-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .message-item {
+    background-color: #fff;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .message-username {
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .message-text {
+    color: #555;
+  }
+  
+  .message-timestamp {
+    color: #777;
+    font-size: 0.875rem;
+    display: block;
+    margin-top: 0.25rem;
+  }
+  
+  .success-popup {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4caf50; /* Green background */
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Show the pop-up when it's targeted */
+  #success-message:target {
+    display: block;
+  }
+
+  /* Close button styling */
+.close-popup {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: white;
+  color: #4caf50;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.close-popup:hover {
+  background-color: #f1f1f1;
+}
+
+/* Popup for leaving the chatroom */
+.left-popup {
+  display: none;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #dc3545; /* Green background */
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Show the pop-up when it's targeted */
+#left-message:target {
+  display: block;
+}
+
+.close-left-popup {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: white;
+  color: #dc3545;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.close-left-popup:hover {
+  background-color: #f1f1f1;
+}
+
+
+
